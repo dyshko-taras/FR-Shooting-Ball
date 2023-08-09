@@ -1,0 +1,212 @@
+{
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	font_20_white: {
+		file: font_20_white.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_24_white: {
+		file: font_24_white.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_24_white_orange: {
+		file: font_24_white_orange.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_32_white_orange: {
+		file: font_32_white_orange.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_40_white: {
+		file: font_40_white.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_48_white_orange: {
+		file: font_48_white_orange.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_button: {
+		file: font_button.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+}
+com.badlogic.gdx.graphics.Color: {
+	RGBA_0_0_0_255: {
+		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+	RGBA_254_206_84_255: {
+		r: 0.99607843
+		g: 0.80784315
+		b: 0.32941177
+		a: 1
+	}
+	RGBA_255_255_255_255: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+	RGBA_57_64_70_255: {
+		r: 0.22352941
+		g: 0.2509804
+		b: 0.27450982
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable: {
+	achievements: {
+		region: achievements
+		minWidth: 29
+		minHeight: 48
+	}
+	block: {
+		region: block
+		minWidth: 60
+		minHeight: 60
+	}
+	br: {
+		region: br
+		minWidth: 72
+		minHeight: 72
+	}
+	button_rect: {
+		region: button_rect
+		minWidth: 260
+		minHeight: 66
+	}
+	en: {
+		region: en
+		minWidth: 72
+		minHeight: 72
+	}
+	iconBall: {
+		region: iconBall
+		minWidth: 125
+		minHeight: 125
+	}
+	line: {
+		region: line
+		minWidth: 360
+		minHeight: 2
+	}
+	ball: {
+		region: ball
+		minWidth: 40
+		minHeight: 40
+	}
+	musicOff: {
+		region: musicOff
+		minWidth: 48
+		minHeight: 48
+	}
+	musicOn: {
+		region: musicOn
+		minWidth: 48
+		minHeight: 48
+	}
+	plus: {
+		region: plus
+		minWidth: 34
+		minHeight: 34
+	}
+	progBar: {
+		region: progBar
+		minWidth: 305
+		minHeight: 80
+	}
+	return: {
+		region: return
+		minWidth: 48
+		minHeight: 48
+	}
+	settings: {
+		region: settings
+		minWidth: 48
+		minHeight: 48
+	}
+	triangle: {
+		region: triangle
+		minWidth: 60
+		minHeight: 60
+	}
+	back: {
+		region: back
+		minWidth: 1920
+		minHeight: 1920
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
+	progBarKnob: {
+		name: white-pixel
+		color: RGBA_254_206_84_255
+		minWidth: 1
+		minHeight: 80
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
+	default: {
+		font: font_button
+		up: button_rect
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: font_48_white_orange
+	}
+	f48_w_o: {
+		parent: default
+		font: font_48_white_orange
+	}
+	f32_w_o: {
+		parent: default
+		font: font_32_white_orange
+	}
+	f24_w_o: {
+		parent: default
+		font: font_24_white_orange
+	}
+	f40_w: {
+		parent: default
+		font: font_40_white
+	}
+	f24_w: {
+		parent: default
+		font: font_24_white
+	}
+	f20_w: {
+		parent: default
+		font: font_20_white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
+	default-horizontal: {
+		background: progBar
+		knobBefore: progbarknob
+	}
+	default-vertical: {
+		background: progBar
+		knobBefore: progBarKnob
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+}
