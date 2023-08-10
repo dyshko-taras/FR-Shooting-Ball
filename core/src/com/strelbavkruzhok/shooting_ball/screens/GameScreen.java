@@ -81,18 +81,18 @@ public class GameScreen implements Screen {
 
         table.row();
         numBalls = new Label("1x", skin, "f24_w");
-        table.add(numBalls).padLeft(124.0f).padTop(579.0f).expandX().align(Align.topLeft).colspan(2);
+        table.add(numBalls).padLeft(124.0f).padBottom(7.0f).expand().align(Align.bottomLeft).colspan(2);
 
         table.row();
         Image simpleLine = new Image(skin, "line");
-        table.add(simpleLine).padTop(7.0f).expandX().align(Align.top).colspan(2);
+        table.add(simpleLine).padBottom(21.0f).expandX().align(Align.bottom).colspan(2);
 
         table.row();
         settingButton = new Image(skin, "settings");
-        table.add(settingButton).padLeft(24.0f).padBottom(24.0f).expand().align(Align.bottomLeft);
+        table.add(settingButton).padLeft(24.0f).padBottom(24.0f).expandX().align(Align.bottomLeft);
 
         achievementsButton = new Image(skin, "achievements");
-        table.add(achievementsButton).padRight(28.0f).padBottom(28.0f).expand().align(Align.bottomRight);
+        table.add(achievementsButton).padRight(28.0f).padBottom(28.0f).expandX().align(Align.bottomRight);
 
         container.setActor(table);
         mainTable.add(container);

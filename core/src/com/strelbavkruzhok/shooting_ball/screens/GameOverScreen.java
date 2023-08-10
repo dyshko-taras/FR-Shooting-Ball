@@ -94,22 +94,18 @@ public class GameOverScreen implements Screen {
 
         table.row();
         numBalls = new Label("1x", skin, "f24_w");
-        table.add(numBalls).padLeft(124.0f).padTop(136.0f).align(Align.topLeft);
-
-        Image ball = new Image(skin, "ball");
-        table.add(ball).padRight(160.0f).padTop(132.0f).expandX().align(Align.topRight);
+        table.add(numBalls).padLeft(124.0f).padBottom(7.0f).expand().align(Align.bottomLeft).colspan(2);
 
         table.row();
         Image simpleLine = new Image(skin, "line");
-        table.add(simpleLine).padTop(7.0f).expandX().align(Align.top).colspan(2);
+        table.add(simpleLine).padBottom(21.0f).expandX().align(Align.bottom).colspan(2);
 
         table.row();
         settingButton = new Image(skin, "settings");
-        table.add(settingButton).padLeft(24.0f).padBottom(24.0f).align(Align.bottomLeft);
+        table.add(settingButton).padLeft(24.0f).padBottom(24.0f).expandX().align(Align.bottomLeft);
 
         achievementsButton = new Image(skin, "achievements");
-        achievementsButton.setScaling(Scaling.fit);
-        table.add(achievementsButton).padRight(28.0f).padBottom(28.0f).expand().align(Align.bottomRight);
+        table.add(achievementsButton).padRight(28.0f).padBottom(28.0f).expandX().align(Align.bottomRight);
 
         container.setActor(table);
         mainTable.add(container);
