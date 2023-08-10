@@ -6,6 +6,12 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		markupEnabled: false
 		flip: false
 	}
+	font_24_orange: {
+		file: font_24_orange.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
 	font_24_white: {
 		file: font_24_white.fnt
 		scaledSize: -1
@@ -192,6 +198,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	f20_w: {
 		parent: default
 		font: font_20_white
+	}
+	f24_o: {
+		parent: default
+		font: font_24_orange
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
