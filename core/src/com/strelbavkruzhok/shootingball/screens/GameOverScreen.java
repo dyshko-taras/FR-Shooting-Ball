@@ -19,6 +19,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.strelbavkruzhok.shootingball.Main;
+import com.strelbavkruzhok.shootingball.actors.ArrowActor;
+import com.strelbavkruzhok.shootingball.actors.BallActor;
+import com.strelbavkruzhok.shootingball.actors.GroupActors;
 import com.strelbavkruzhok.shootingball.tools.GameSettings;
 import com.strelbavkruzhok.shootingball.tools.Localization;
 
@@ -51,11 +54,16 @@ public class GameOverScreen implements Screen {
     //Game
     private int score;
     private int numBalls;
+    private Image imageBallActor;
+    private float XImageBallActor;
+    private float YImageBallActor;
 
-    public GameOverScreen(Main main, int score, int numBalls) {
+    public GameOverScreen(Main main, int score, int numBalls, float XImageBallActor, float YImageBallActor) {
         this.main = main;
         this.score = score;
         this.numBalls = numBalls;
+        this.XImageBallActor = XImageBallActor;
+        this.YImageBallActor = YImageBallActor;
         setMaximumScore();
     }
 
@@ -86,7 +94,7 @@ public class GameOverScreen implements Screen {
         table.add(labelGameOver).padTop(122.0f).expandX().align(Align.top).colspan(2);
 
         table.row();
-        labelScore = new Label("SCORE: 23", skin, "f24_w_o");
+        labelScore = new Label("SCORE: 0", skin, "f24_w_o");
         labelScore.setAlignment(Align.center);
         table.add(labelScore).padTop(50.0f).expandX().align(Align.top).colspan(2);
 
@@ -117,6 +125,7 @@ public class GameOverScreen implements Screen {
         setClickListeners();
         initLocalizedUI();
         setData();
+        addMyActors();
     }
 
     private void setClickListeners() {
@@ -226,5 +235,11 @@ public class GameOverScreen implements Screen {
         if (GameSettings.getBestScore() < score) {
             GameSettings.setBestScore(score);
         }
+    }
+
+    public void addMyActors() {
+        imageBallActor = new Image(skin, "ball");
+        imageBallActor.setBounds(XImageBallActor, YImageBallActor, 40, 40);
+        stage.addActor(imageBallActor);
     }
 }

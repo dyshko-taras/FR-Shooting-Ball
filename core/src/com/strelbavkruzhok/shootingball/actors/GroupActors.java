@@ -11,10 +11,10 @@ public class GroupActors extends Group {
 
     private final float dx;
     private final float dy;
-    private final World world;
     private int numRows = 0;
     private BlockActorFactory blockActorFactory;
     private PlusCircleActorFactory plusCircleActorFactory;
+    private TriangleActorFactory triangleActorFactory;
 
     //Act
     private float durationAct;
@@ -25,20 +25,19 @@ public class GroupActors extends Group {
                        float y,
                        float dx,
                        float dy,
-                       World world,
                        float durationAct,
                        float distanceYAct,
                        BlockActorFactory blockActorFactory,
-                       PlusCircleActorFactory plusCircleActorFactory) {
+                       PlusCircleActorFactory plusCircleActorFactory,
+                       TriangleActorFactory triangleActorFactory) {
         super();
         this.dx = dx;
         this.dy = dy;
-        this.world = world;
         this.durationAct = durationAct;
         this.distanceYAct = distanceYAct;
         this.blockActorFactory = blockActorFactory;
         this.plusCircleActorFactory = plusCircleActorFactory;
-
+        this.triangleActorFactory = triangleActorFactory;
         setPosition(x, y);
     }
 
@@ -62,23 +61,29 @@ public class GroupActors extends Group {
 
     public void addRandomRow(int numElements, float widthElement, float heightElement) {
         for (int numColumn = 0; numColumn < numElements; numColumn++) {
-            if (MyMath.calculateProbability(100)) {
+            if (MyMath.calculateProbability(80)) {
                 int randomActor = MathUtils.random(0, 9);
-                if (randomActor < 5) {
+                if (randomActor < 10) {
                     BlockActor blockActor = blockActorFactory.createBlockActor();
                     addActor(blockActor);
                     blockActor.setPositionB2(
                             numColumn * (widthElement + dx),
                             numRows * (heightElement + dy),
                             this);
-                } else if (randomActor < 10) {
+                } else if (randomActor < 7) {
+                    TriangleActor triangleActor = triangleActorFactory.createTriangleActor();
+                    addActor(triangleActor);
+                    triangleActor.setPositionB2(
+                            numColumn * (widthElement + dx),
+                            numRows * (heightElement + dy),
+                            this);
+                } else {
                     PlusCircleActor plusCircleActor = plusCircleActorFactory.createPlusCircleActor();
                     addActor(plusCircleActor);
                     plusCircleActor.setPositionB2(
                             numColumn * (widthElement + dx) + (widthElement - plusCircleActor.getWidth()) / 2,
                             numRows * (heightElement + dy) + (heightElement - plusCircleActor.getHeight()) / 2,
                             this);
-                    System.out.println("add plus circle");
                 }
             }
         }
@@ -95,6 +100,11 @@ public class GroupActors extends Group {
             if (actor instanceof PlusCircleActor) {
                 PlusCircleActor plusCircleActor = (PlusCircleActor) actor;
                 plusCircleActor.updateB2Position(this);
+            }
+
+            if (actor instanceof TriangleActor) {
+                TriangleActor triangleActor = (TriangleActor) actor;
+                triangleActor.updateB2Position(this);
             }
         }
     }

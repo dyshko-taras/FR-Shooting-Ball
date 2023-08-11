@@ -33,6 +33,8 @@ import com.strelbavkruzhok.shootingball.actors.BlockActorFactory;
 import com.strelbavkruzhok.shootingball.actors.GroupActors;
 import com.strelbavkruzhok.shootingball.actors.PlusCircleActor;
 import com.strelbavkruzhok.shootingball.actors.PlusCircleActorFactory;
+import com.strelbavkruzhok.shootingball.actors.TriangleActor;
+import com.strelbavkruzhok.shootingball.actors.TriangleActorFactory;
 import com.strelbavkruzhok.shootingball.box2d.B2Screen;
 import com.strelbavkruzhok.shootingball.box2d.ListenerClass;
 import com.strelbavkruzhok.shootingball.tools.GameSettings;
@@ -42,7 +44,7 @@ import com.strelbavkruzhok.shootingball.utils.LineAngleCalculator;
 
 import java.util.Iterator;
 
-public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFactory {
+public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFactory, TriangleActorFactory {
 
     public static final float SCREEN_WIDTH = Main.SCREEN_WIDTH;
     public static final float SCREEN_HEIGHT = Main.SCREEN_HEIGHT;
@@ -74,6 +76,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     private float degrees = 0;
     private Image imageBlockActor;
     private Image imagePlusCircleActor;
+    private Image imageTriangleActor;
     private GroupActors groupActors;
 
 
@@ -85,6 +88,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     private ListenerClass listenerClass;
     private Array<BlockActor> blocksActorToRemove = new Array<BlockActor>();
     private Array<PlusCircleActor> plusCircleActorToRemove = new Array<PlusCircleActor>();
+    private Array<TriangleActor> triangleActorToRemove = new Array<TriangleActor>();
     private B2Screen b2Screen;
 
     //Game
@@ -120,7 +124,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         table.add(returnButton).padLeft(24.0f).padTop(30.0f).expandX().align(Align.topLeft).colspan(2);
 
         table.row();
-        labelScore = new Label("23", skin, "f48_w_o");
+        labelScore = new Label("0", skin, "f48_w_o");
         labelScore.setAlignment(Align.center);
         table.add(labelScore).padTop(-57.0f).expandX().align(Align.top).colspan(2);
 
@@ -174,13 +178,6 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                 main.setScreen(new AchievScreen(main));
             }
         });
-        ////////////////////////////////
-        labelNumBalls.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                main.setScreen(new GameOverScreen(main, score, numBalls));
-            }
-        });
     }
 
     public void render(float delta) {
@@ -198,6 +195,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     private void update(float delta) {
         setData();
         removeBlocksActorAndAddPoint();
+        removeTriangleActorAndAddPoint();
         removePlusCircleActorAndAddNumBalls();
         addBlockActorIfStop();
         checkGameOver();
@@ -226,7 +224,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
 
     /////Camera
     private void showCameraAndStage() {
-        viewportBackground = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT); // ExtendViewport or FitViewport
+        viewportBackground = new FitViewport(SCREEN_WIDTH, SCREEN_HEIGHT); // ExtendViewport or FitViewport
         stageBackground = new Stage(viewportBackground);
 
         viewport = new FitViewport(SCREEN_WIDTH, SCREEN_HEIGHT);//only FitViewport
@@ -260,6 +258,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
 
     private void setData() {
         labelNumBalls.setText(numBalls + "x");
+        labelScore.setText(score);
     }
 
     public void initAssets() {
@@ -267,11 +266,11 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         imageArrowActor = new Image(skin, "arrow2");
         imageBlockActor = new Image(skin, "block");
         imagePlusCircleActor = new Image(skin, "plus");
+        imageTriangleActor = new Image(skin, "triangle");
     }
 
     //
     public void addMyActors() {
-
         ballActor = new BallActor(imageBallActor, 160, 100, 20, world, worldScale);
         stage.addActor(ballActor);
 
@@ -285,8 +284,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                 imageArrowActor.getHeight() / 2
         );
 
-        groupActors = new GroupActors(10, 632, 10, 10, world, 0.5f, 70, this, this);
-//        groupBlocks.addRandomRow(addArrayBlocksActor(5));
+        groupActors = new GroupActors(10, 632, 10, 10, 0.5f, 70, this, this,this);
         groupActors.addRandomRow(5, 60, 60);
         stage.addActor(groupActors);
     }
@@ -385,7 +383,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         debugRenderer = new Box2DDebugRenderer();
         viewportBox2D = new FitViewport(SCREEN_WIDTH * worldScale, SCREEN_HEIGHT * worldScale); //FitViewport or ExtendViewport
         World.setVelocityThreshold(0.1f);
-        listenerClass = new ListenerClass(blocksActorToRemove,plusCircleActorToRemove);
+        listenerClass = new ListenerClass(blocksActorToRemove,plusCircleActorToRemove,triangleActorToRemove);
         world.setContactListener(listenerClass);
         addBodyBox2D();
     }
@@ -422,6 +420,23 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         }
     }
 
+
+    private void removeTriangleActorAndAddPoint() {
+        if (triangleActorToRemove != null && triangleActorToRemove.size > 0) {
+            for (Iterator<TriangleActor> it = triangleActorToRemove.iterator(); it.hasNext(); ) {
+                TriangleActor actor = it.next();
+                if (LabelNum.getNum(actor.label) > 1) {
+                    LabelNum.removeOne(actor.label);
+                } else {
+                    score += actor.point;
+                    world.destroyBody(actor.b2Triangle.getBody());
+                    actor.remove();
+                }
+                it.remove();
+            }
+        }
+    }
+
     private void removePlusCircleActorAndAddNumBalls() {
         if (plusCircleActorToRemove != null && plusCircleActorToRemove.size > 0) {
             for (Iterator<PlusCircleActor> it = plusCircleActorToRemove.iterator(); it.hasNext(); ) {
@@ -434,25 +449,6 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         }
     }
 
-//    private Array<BlockActor> addArrayBlocksActor(int numColumns) {
-//        Array<BlockActor> array = new Array<BlockActor>();
-//        for (int i = 0; i < numColumns; i++) {
-//            BlockActor blockActor = new BlockActor(imageBlockActor, new Label("", skin, "f24_o"), 0, 0, 60, 60, world, worldScale);
-//            array.add(blockActor);
-//        }
-//        return array;
-//    }
-
-
-//
-//    private Array<PlusCircleActor> addArrayPlusCircleActor(int numColumns) {
-//        Array<PlusCircleActor> array = new Array<PlusCircleActor>();
-//        for (int i = 0; i < numColumns; i++) {
-//            PlusCircleActor plusCircleActor = new PlusCircleActor(imagePlusCircleActor, 0, 0, 30);
-//            array.add(plusCircleActor);
-//        }
-//        return array;
-//    }
 
     private void addBlockActorIfStop() {
         if (GameState.getState() == GameState.STOP_BLOCKS) {
@@ -466,9 +462,9 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     private void checkGameOver() {
         for (Actor actor : groupActors.getChildren()) {
 //            System.out.println(actor.getY() + groupBlocks.getY());
-            if (actor.getY() + groupActors.getY() < 100) {
+            if (actor.getY() + groupActors.getY() < 140) {
                 GameState.setState(GameState.GAME_OVER);
-                main.setScreen(new GameOverScreen(main, score, numBalls));
+                main.setScreen(new GameOverScreen(main, score, numBalls,ballActor.getX(),ballActor.getY()));
             }
         }
     }
@@ -476,12 +472,34 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
 
     @Override
     public BlockActor createBlockActor() {
-        return new BlockActor(imageBlockActor, new Label("", skin, "f24_o"), 0, 0, 60, 60, world, worldScale);
+        return new BlockActor(imageBlockActor,
+                new Label("", skin, "f24_o"),
+                0,
+                0,
+                60,
+                60,
+                world,
+                worldScale);
     }
 
     @Override
     public PlusCircleActor createPlusCircleActor() {
         return new PlusCircleActor(imagePlusCircleActor, 0, 0, 17, world, worldScale);
+    }
+
+    @Override
+    public TriangleActor createTriangleActor() {
+        return new TriangleActor(imageTriangleActor,
+                new Label("", skin, "f24_o"),
+                0,
+                0,
+                60,
+                60,
+                new Vector2(60,0),
+                new Vector2(60,60),
+                new Vector2(0,60),
+                world,
+                worldScale);
     }
 }
 

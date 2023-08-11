@@ -25,9 +25,9 @@ public class BallActor extends Actor {
         this.image = image;
         circle = new Circle();
         this.radius = radius;
+        b2Ball = new B2CircleDynamic_Ball(world, x, y, radius, worldScale, this);
 
         setBounds(x, y, radius * 2, radius * 2);
-        b2Ball = new B2CircleDynamic_Ball(world, x, y, radius, worldScale, this);
     }
 
     @Override
