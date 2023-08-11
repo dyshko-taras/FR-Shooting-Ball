@@ -30,7 +30,7 @@ public class B2Screen {
         screenFixtureDef.friction = 0;
         screenFixtureDef.restitution = 1;
 
-        screenShape.set(0, 0, worldWidth, 0);
+        screenShape.set(0, 95 * worldScale, worldWidth, 95 * worldScale); // Верхня границя
         screenFixtureDef.shape = screenShape;
         screenFixtureDef.friction = 0;
         screenBody.createFixture(screenFixtureDef);

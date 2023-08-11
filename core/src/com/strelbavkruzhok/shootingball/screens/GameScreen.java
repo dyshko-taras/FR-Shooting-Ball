@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,7 +23,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.strelbavkruzhok.shootingball.Main;
@@ -69,7 +69,8 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     private Image achievementsButton;
 
     //Actors
-    private BallActor ballActor;
+//    private BallActor ballActor;
+    private Array<BallActor> ballActors = new Array<BallActor>();
     private Image imageBallActor;
     private ArrowActor arrowActor;
     private Image imageArrowActor;
@@ -94,6 +95,13 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
     //Game
     private int score = 0;
     private int numBalls = 1;
+    private Filter ballFilter = new Filter();
+    private float elapsedTime = 0;
+    private float interval = 0.2f;
+    private int currentBallIndex = 0;
+    private boolean allStopped = true;
+    private float lastX = 0;
+
 
     public GameScreen(Main main) {
         this.main = main;
@@ -199,6 +207,8 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         removePlusCircleActorAndAddNumBalls();
         addBlockActorIfStop();
         checkGameOver();
+        updateBalls(delta);
+        checkIsStopBalls();
     }
 
     @Override
@@ -271,22 +281,69 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
 
     //
     public void addMyActors() {
-        ballActor = new BallActor(imageBallActor, 160, 100, 20, world, worldScale);
-        stage.addActor(ballActor);
+        addFilter();
+        createArrayBallActors(numBalls, 160, 100, 20);
 
         arrowActor = new ArrowActor(
                 imageArrowActor,
-                ballActor.getCircle().x,
-                ballActor.getCircle().y - imageArrowActor.getHeight() / 2,
+                ballActors.get(0).getCircle().x,
+                ballActors.get(0).getCircle().y - imageArrowActor.getHeight() / 2,
                 imageArrowActor.getWidth(),
                 imageArrowActor.getHeight(),
                 0,
                 imageArrowActor.getHeight() / 2
         );
 
-        groupActors = new GroupActors(10, 632, 10, 10, 0.5f, 70, this, this,this);
+        groupActors = new GroupActors(10, 632, 10, 10, 0.5f, 70, this, this, this);
         groupActors.addRandomRow(5, 60, 60);
         stage.addActor(groupActors);
+    }
+
+    public void updateBalls(float delta) {
+        elapsedTime += delta;
+        if (GameState.getState() == GameState.SHOOTING && elapsedTime >= interval) {
+            if (currentBallIndex == ballActors.size) {
+                GameState.setState(GameState.BALL_MOVING);
+                currentBallIndex = 0;
+            } else {
+                ballActors.get(currentBallIndex).isMoving = true;
+                elapsedTime = 0;
+                currentBallIndex++;
+            }
+        }
+    }
+
+    private void checkIsStopBalls() {
+        allStopped = true;
+        for (BallActor ballActor : ballActors) {
+            if (!ballActor.isStopped) {
+                lastX = ballActor.getX();
+                allStopped = false;
+                break;
+            }
+        }
+        if (allStopped) {
+            for (Iterator<BallActor> it = ballActors.iterator(); it.hasNext(); ) {
+                BallActor ballActor = it.next();
+                world.destroyBody(ballActor.b2Ball.getBody());
+                ballActor.remove();
+                it.remove();
+            }
+            createArrayBallActors(numBalls, lastX, 100, 20);
+            GameState.setState(GameState.BLOCKS_MOVING);
+        }
+    }
+
+
+    public Array<BallActor> createArrayBallActors(int numBalls, float x, float y, float radius) {
+        ballActors.clear();
+        for (int i = 0; i < numBalls; i++) {
+            BallActor ballActor = new BallActor(imageBallActor, x, y, radius, world, worldScale);
+            ballActor.b2Ball.getBody().getFixtureList().get(0).setFilterData(ballFilter);
+            ballActors.add(ballActor);
+            stage.addActor(ballActor);
+        }
+        return ballActors;
     }
 
     private void initInputProcessor() {
@@ -300,16 +357,15 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                     float x = touch.x;
                     float y = touch.y;
 
-                    if (ballActor.getCircle().contains(x, y)) {
+                    if (ballActors.get(0).getCircle().contains(x, y)) {
                         stage.addActor(arrowActor);
 
                         degrees = LineAngleCalculator.getDegrees(
                                 arrowActor.getX() + arrowActor.getOriginX(),
                                 arrowActor.getY() + arrowActor.getOriginY(),
                                 x, y);
-                        arrowActor.setPosition(ballActor.getCircle().x, ballActor.getCircle().y - imageArrowActor.getHeight() / 2);
+                        arrowActor.setPosition(ballActors.get(0).getCircle().x, ballActors.get(0).getCircle().y - imageArrowActor.getHeight() / 2);
                         arrowActor.degrees = degrees;
-//                        System.out.println("degrees = " + degrees);
                     }
                 }
                 return true;
@@ -327,9 +383,8 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                             arrowActor.getY() + arrowActor.getOriginY(),
                             x, y);
 
-                    arrowActor.setPosition(ballActor.getCircle().x, ballActor.getCircle().y - imageArrowActor.getHeight() / 2);
+                    arrowActor.setPosition(ballActors.get(0).getCircle().x, ballActors.get(0).getCircle().y - imageArrowActor.getHeight() / 2);
                     arrowActor.degrees = degrees;
-                    System.out.println("degrees = " + degrees);
                 }
                 return true;
             }
@@ -340,7 +395,9 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                     System.out.println("TouchUp");
                     arrowActor.degrees = 0;
                     arrowActor.remove();
-                    ballActor.degrees = degrees;
+                    for (BallActor ballActor : ballActors) {
+                        ballActor.degrees = degrees;
+                    }
                     GameState.setState(GameState.SHOOTING);
                 }
                 return true;
@@ -383,7 +440,7 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
         debugRenderer = new Box2DDebugRenderer();
         viewportBox2D = new FitViewport(SCREEN_WIDTH * worldScale, SCREEN_HEIGHT * worldScale); //FitViewport or ExtendViewport
         World.setVelocityThreshold(0.1f);
-        listenerClass = new ListenerClass(blocksActorToRemove,plusCircleActorToRemove,triangleActorToRemove);
+        listenerClass = new ListenerClass(blocksActorToRemove, plusCircleActorToRemove, triangleActorToRemove);
         world.setContactListener(listenerClass);
         addBodyBox2D();
     }
@@ -461,10 +518,9 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
 
     private void checkGameOver() {
         for (Actor actor : groupActors.getChildren()) {
-//            System.out.println(actor.getY() + groupBlocks.getY());
             if (actor.getY() + groupActors.getY() < 140) {
                 GameState.setState(GameState.GAME_OVER);
-                main.setScreen(new GameOverScreen(main, score, numBalls,ballActor.getX(),ballActor.getY()));
+                main.setScreen(new GameOverScreen(main, score, numBalls, ballActors.get(0).getX(), ballActors.get(0).getY()));
             }
         }
     }
@@ -495,11 +551,17 @@ public class GameScreen implements Screen, BlockActorFactory, PlusCircleActorFac
                 0,
                 60,
                 60,
-                new Vector2(60,0),
-                new Vector2(60,60),
-                new Vector2(0,60),
+                new Vector2(60, 0),
+                new Vector2(60, 60),
+                new Vector2(0, 60),
                 world,
                 worldScale);
+    }
+
+
+    private void addFilter() {
+        ballFilter.categoryBits = 0x0002;
+        ballFilter.maskBits = 0x0001;
     }
 }
 

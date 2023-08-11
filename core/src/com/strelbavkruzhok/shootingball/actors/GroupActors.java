@@ -46,7 +46,7 @@ public class GroupActors extends Group {
         super.act(delta);
 
         if(GameState.getState() == GameState.BLOCKS_MOVING) {
-            System.out.println("Get blocks moving");
+//            System.out.println("Get blocks moving");
             elapsedTime += delta;
             if(elapsedTime <= durationAct) {
                 moveBy(0,-distanceYAct/durationAct * delta);
@@ -54,23 +54,23 @@ public class GroupActors extends Group {
             } else {
                 GameState.setState(GameState.STOP_BLOCKS);
                 elapsedTime = 0;
-                System.out.println("Set stop blocks");
+//                System.out.println("Set stop blocks");
             }
         }
     }
 
     public void addRandomRow(int numElements, float widthElement, float heightElement) {
         for (int numColumn = 0; numColumn < numElements; numColumn++) {
-            if (MyMath.calculateProbability(80)) {
+            if (MyMath.calculateProbability(100)) {
                 int randomActor = MathUtils.random(0, 9);
-                if (randomActor < 10) {
+                if (randomActor < 4) {
                     BlockActor blockActor = blockActorFactory.createBlockActor();
                     addActor(blockActor);
                     blockActor.setPositionB2(
                             numColumn * (widthElement + dx),
                             numRows * (heightElement + dy),
                             this);
-                } else if (randomActor < 7) {
+                } else if (randomActor < 8) {
                     TriangleActor triangleActor = triangleActorFactory.createTriangleActor();
                     addActor(triangleActor);
                     triangleActor.setPositionB2(
